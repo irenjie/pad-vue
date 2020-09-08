@@ -6,15 +6,15 @@
 
 ### 上线修改
 
-- PersonEdit：文件上传、文件下载的地址. (85,225)行
-- NowPersonEdit：文件上传、文件下载地址. (111,302)行
+- PersonEdit：文件上传、文件下载的地址
+- NowPersonEdit：文件上传、文件下载地址
 - axios.config.js: 全局请求开头
 - 后端数据库配置信息
 - error界面跳转信息(忽略)
 - 后端文件操作
 
 ## Project setup
-```
+```****
 npm install
 ```
 

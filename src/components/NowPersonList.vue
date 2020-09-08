@@ -6,8 +6,8 @@
                 <el-table-column prop="name" label="姓名" width="100"></el-table-column>
                 <!--<el-table-column prop="keysname" label="关键字" width="100"></el-table-column>-->
                 <el-table-column prop="cstEntry" label="入职时间" width="100"></el-table-column>
-                <el-table-column prop="department" label="部门" width="100"></el-table-column>
-                <el-table-column prop="post" label="岗位" width="100"></el-table-column>
+                <el-table-column prop="department" label="部门"></el-table-column>
+                <el-table-column prop="post" label="岗位"></el-table-column>
                 <!-- 状态：在职/离职-->
                 <el-table-column prop="status" label="状态" width="60"></el-table-column>
                 <el-table-column prop="phone" label="电话" width="120"></el-table-column>
@@ -49,8 +49,8 @@
         data() {
             return {
                 currentPage: 1, // 当前页
-                total: 0,        // 文章总数
-                pageSize: 10,     // 页面大小，每页文章数
+                total: 0,        // 总数
+                pageSize: 20,     // 页面大小
                 nowpersons: [],      // 在职人员信息
                 dialogVisible: false,    // 分享弹出框显示和隐藏
                 sharedInfo: 'null',      // 分享内容
@@ -76,7 +76,12 @@
             },
             editperson(row, n) {
                 // n 区分查看还是编辑，决定创建/编辑按钮是否显示。1：查看。2：编辑
-                this.$router.push('/nowperson/' + n + '' + row.id + '/edit')
+                /*this.$router.push('/nowperson/' + n + '' + row.id + '/edit')*/
+                let r = this.$router.resolve({
+                    name: 'NowPersonEdit',
+                    params: {nowpersonId: n + '' + row.id}
+                })
+                window.open(r.href, '_blank')
             },
             deleteperson(row) {
                 this.$confirm('此操作将删除该员工信息, 是否继续?', '提示', {
@@ -134,7 +139,7 @@
                         + '毕业学校：' + (row.school == null ? '' : row.school) + '\n'
                         + '专业：' + (row.major == null ? '' : row.major) + '\n'
                         + '学历：' + (row.qualification == null ? '' : row.qualification) + '\n'
-                        + '毕业时间：' + row.cstGraduation.substr(0,10) + '\n'
+                        + '毕业时间：' + row.cstGraduation.substr(0, 10) + '\n'
                         + '备注/其它：' + (row.workset == null ? '' : row.workset)
                 })
             },

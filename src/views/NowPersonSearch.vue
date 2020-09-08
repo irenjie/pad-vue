@@ -31,8 +31,8 @@
                     <el-table-column prop="name" label="姓名" width="100"></el-table-column>
                     <!--<el-table-column prop="keysname" label="关键字" width="100"></el-table-column>-->
                     <el-table-column prop="cstEntry" label="入职时间" width="100"></el-table-column>
-                    <el-table-column prop="department" label="部门" width="100"></el-table-column>
-                    <el-table-column prop="post" label="岗位" width="100"></el-table-column>
+                    <el-table-column prop="department" label="部门"></el-table-column>
+                    <el-table-column prop="post" label="岗位"></el-table-column>
                     <!-- 状态：在职/离职-->
                     <el-table-column prop="status" label="状态" width="60"></el-table-column>
                     <el-table-column prop="phone" label="电话" width="120"></el-table-column>
@@ -118,7 +118,12 @@
             },
             editperson(row, n) {
                 // n 区分查看还是编辑，决定创建/编辑按钮是否显示。1：查看。2：编辑
-                this.$router.push('/nowperson/' + n + '' + row.id + '/edit')
+                /*this.$router.push('/nowperson/' + n + '' + row.id + '/edit')*/
+                let r=this.$router.resolve({
+                    name: 'NowPersonEdit',
+                    params: {nowpersonId: n + '' + row.id}
+                })
+                window.open(r.href,'_blank')
             },
             deleteperson(row) {
                 this.$confirm('此操作将删除该员工信息, 是否继续?', '提示', {

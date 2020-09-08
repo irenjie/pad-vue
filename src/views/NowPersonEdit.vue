@@ -30,13 +30,13 @@
                 </el-form-item>
                 <el-form-item label="毕业时间" align="center" prop="cstGraduation">
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstGraduation"
+                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstGraduation" value-format="yyyy-MM-ddT"
                                         style="width: 100%;"></el-date-picker>
                     </el-col>
                 </el-form-item>
                 <el-form-item label="入职时间" align="center" prop="cstEntry">
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstEntry"
+                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstEntry" value-format="yyyy-MM-ddT"
                                         style="width: 100%;"></el-date-picker>
                     </el-col>
                 </el-form-item>
@@ -48,7 +48,7 @@
                                           v-for="(nowPersonRank, index) in nowPersonRanks"
                                           :key="index" :color="nowPersonRank.color"
                                           :timestamp="nowPersonRank.cstChange">
-                            {{nowPersonRank.rankname}}--{{nowPersonRank.reason}}
+                            {{nowPersonRank.rankname}}&nbsp&nbsp&nbsp&nbsp{{nowPersonRank.reason}}
                         </el-timeline-item>
                     </el-timeline>
                     <div style="text-align: left;">
@@ -68,7 +68,7 @@
                                 </el-form-item>
                                 <el-form-item label="升/降日期" prop="cstChange" style="margin-bottom: 20px">
                                     <el-col :span="11">
-                                        <el-date-picker type="date" placeholder="选择日期"
+                                        <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-ddT"
                                                         v-model="addRankForm.cstChange"></el-date-picker>
                                     </el-col>
                                 </el-form-item>
@@ -93,8 +93,8 @@
                 </el-form-item>
                 <el-form-item label="离职时间" align="center" prop="cstResign">
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstResign"
-                                        style="width: 100%;"></el-date-picker>
+                        <el-date-picker type="date" placeholder="选择日期" v-model="nowform.cstResign" style="width: 100%;"
+                                        value-format="yyyy-MM-ddT"></el-date-picker>
                     </el-col>
                 </el-form-item>
                 <el-form-item label="离职原因" prop="resignReason">
@@ -108,7 +108,7 @@
                 <el-form-item label="文件上传" v-show="isEdit">
                     <el-upload ref="upload" :on-preview="handlePreview" :on-remove="handleRemove" :auto-upload="false"
                                :file-list="uploadFileList" :data="nowform"
-                                action="http://192.168.90.82:39081/hypad/upload">
+                               action="http://localhost:39081/hypad/upload">
                         <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
                         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload"
                                    v-show="isEdit">上传到服务器
@@ -118,7 +118,8 @@
                 </el-form-item>
                 <el-form-item label="文件下载" v-show="isEdit">
                     <el-table :data="files" stripe style="width: 100%">
-                        <el-table-column :label="0" label="文件名" min-width="300" prop="name" show-overflow-tooltip></el-table-column>
+                        <el-table-column :label="0" label="文件名" min-width="300" prop="name"
+                                         show-overflow-tooltip></el-table-column>
                         <el-table-column label="操作" width="200">
                             <template slot-scope="scope">
                                 <el-button type="text" @click="downloadFile(scope.row)" size="small">下载</el-button>
@@ -216,12 +217,14 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         const _this = this
+                        this.formatDate()
                         this.nowform.gender = this.nowform.gender == '男' ? '1' : '0'
-                        console.log("success submit!!!")
                         /* 使用 Jackson 的一个注释，现在传输给前端的数据没有 cstCreate 这种没必要传输的数据 */
                         this.$axios.post('/nowperson/edit', this.nowform, {}).then(result => {
                             // 表单提交后返回员工列表页
-                            this.$router.push('/nowperson')
+                            if (_this.isEdit){
+                                location.reload()
+                            }
                         })
                     } else {
                         console.log('error submit!!!')
@@ -229,16 +232,22 @@
                     }
                 });
             },
+            formatDate(){
+                this.nowform.cstResign=this.nowform.cstResign!=null&&this.nowform.cstResign!=''?this.nowform.cstResign.substr(0,11)+"16:00:00":''
+                this.nowform.cstGraduation=this.nowform.cstGraduation!=null&&this.nowform.cstGraduation!=''?this.nowform.cstGraduation.substr(0,11)+"16:00:00":''
+                this.nowform.cstEntry=this.nowform.cstEntry!=null&&this.nowform.cstEntry!=''?this.nowform.cstEntry.substr(0,11)+"16:00:00":''
+            },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
             },
             /* 删除最近职级 */
             deletePersonRank() {
+                const _this = this
                 if (this.nowPersonRanks.length == 0) {
                     return
                 }
                 this.$axios.get('/nowpersonrank/delete/' +
-                    this.nowPersonRanks[this.nowPersonRanks.length - 1].id).then(result => {
+                    _this.nowPersonRanks[this.nowPersonRanks.length - 1].id).then(result => {
                     location.reload()
                 })
             },
@@ -272,9 +281,10 @@
                 }
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
+                        this.addRankForm.cstChange=this.addRankForm.cstChange.substr(0,11)+"16:00:00"
                         this.$axios.post('/nowpersonrank/add', this.addRankForm, {}).then(result => {
-                            location.reload()
                             this.addRankDialogVisible = false
+                            location.reload()
                         })
                     } else {
                         console.log('error submit!!!')
@@ -290,6 +300,7 @@
                     message: '上传成功！',
                     type: 'success'
                 });
+                location.reload()
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
@@ -298,14 +309,18 @@
                 console.log(file);
             },
             downloadFile(row) {
-                console.log(this.nowform.id+'###########')
-                window.location.href = 'http://192.168.90.82:39081/hypad/downloadFile/' + this.nowform.id + '-' + row.name
+                window.location.href = 'http://localhost:39081/hypad/downloadFile/' + this.nowform.id + '-' + row.name
             },
             deletefile(row) {
+                const _this = this
                 this.$axios.get('/deleteFile/' + this.nowform.id + '-' + row.name).then(res => {
-
+                    _this.$message({
+                        showClose: true,
+                        message: '删除成功！',
+                        type: 'success'
+                    });
+                    location.reload()
                 })
-                location.reload()
             }
         },
         created() {

@@ -48,6 +48,7 @@
                 <el-form-item label="简历日期" align="center" prop="induction">
                     <el-col :span="11">
                         <el-date-picker type="date" placeholder="选择日期" v-model="form.induction"
+                                        value-format="yyyy-MM-ddT"
                                         style="width: 100%;"></el-date-picker>
                     </el-col>
                     <!--<el-col class="line" :span="2">-</el-col>
@@ -60,7 +61,8 @@
                 </el-form-item>
                 <el-form-item label="毕业时间" align="center" prop="gmt_report">
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择日期" v-model="form.gmt_report"
+                        <el-date-picker type="date" placeholder="选择日期" v-model="form.gmtReport"
+                                        value-format="yyyy-MM-ddT"
                                         style="width: 100%;"></el-date-picker>
                     </el-col>
                 </el-form-item>
@@ -82,7 +84,7 @@
                 <el-form-item label="文件上传" v-show="isEdit">
                     <el-upload ref="upload" :on-preview="handlePreview" :on-remove="handleRemove" :auto-upload="false"
                                :file-list="fileList" :data="form"
-                                action="http://192.168.90.82:39081/hypad/upload">
+                               action="http://localhost:39081/hypad/upload">
                         <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
                         <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload"
                                    v-show="isEdit">上传到服务器
@@ -92,7 +94,8 @@
                 </el-form-item>
                 <el-form-item label="文件下载" v-show="isEdit">
                     <el-table :data="files" stripe style="width: 100%">
-                        <el-table-column :label="0" label="文件名" min-width="300" prop="name" show-overflow-tooltip></el-table-column>
+                        <el-table-column :label="0" label="文件名" min-width="300" prop="name"
+                                         show-overflow-tooltip></el-table-column>
                         <el-table-column label="操作" width="200">
                             <template slot-scope="scope">
                                 <el-button type="text" @click="downloadFile(scope.row)" size="small">下载</el-button>
@@ -144,12 +147,9 @@
                     isinterview: '',
                     interviewres: '',
                     workset: '',
-                    gmt_report: '',
+                    gmtReport: '',
                     phone: '',
-                    email: '',
-                    is_delete: '',
-                    gmt_create: '',
-                    gmt_modified: ''
+                    email: ''
                 },
                 index: 0,
                 files: [],
@@ -186,16 +186,22 @@
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         const _this = this
+
+                        this.form.induction = this.form.induction != null && this.form.induction != '' ? this.form.induction.substr(0, 11) + "16:00:00" : ''
+                        this.form.gmtReport = this.form.gmtReport != null && this.form.gmtReport != '' ? this.form.gmtReport.substr(0, 11) + "16:00:00" : ''
+
                         this.form.gender = this.form.gender == '男' ? '1' : '0'
                         this.form.isinterview = this.form.isinterview == '已面试' ? '1' : '0'
                         this.form.interviewres = this.form.interviewres == '通过' ? '1' : '0'
                         console.log("success submit!!!")
                         /* 这里很多属性不应该相互传输，像 gmt_create ,图方便，我觉得应该在后端再封装一个类接管前端数据 */
                         this.$axios.post('/person/edit', this.form, {}).then(result => {
-                            // 插入人员关键字,result 中返回刚插入的人员 Id
+                            // 插入人员关键字,res2 中返回刚插入的人员 Id
                             var temp = result.data.data + '-' + _this.keysname.join('-')
                             _this.$axios.get('/personkey/edit/' + temp).then(res2 => {
-                                _this.$router.push('/')
+                                if (_this.isEdit) {
+                                    location.reload()
+                                }
                             })
                         })
                     } else {
@@ -214,6 +220,7 @@
                     message: '上传成功！',
                     type: 'success'
                 });
+                location.reload()
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
@@ -222,13 +229,18 @@
                 console.log(file);
             },
             downloadFile(row) {
-                window.location.href = 'http://192.168.90.82:39081/hypad/downloadFile/' + this.form.id + '-' + row.name
+                window.location.href = 'http://localhost:39081/hypad/downloadFile/' + this.form.id + '-' + row.name
             },
             deletefile(row) {
+                const _this = this
                 this.$axios.get('/deleteFile/' + this.form.id + '-' + row.name).then(res => {
-
+                    _this.$message({
+                        showClose: true,
+                        message: '删除成功！',
+                        type: 'success'
+                    });
+                    location.reload()
                 })
-                location.reload()
             }
         },
         created() {

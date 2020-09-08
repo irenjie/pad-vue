@@ -129,7 +129,12 @@
             },
             editperson(row, n) {
                 // n 区分查看还是编辑，决定创建/编辑按钮是否显示。1：查看。2：编辑
-                this.$router.push('/person/' + n + '' + row.id + '/edit')
+                // this.$router.push('/person/' + n + '' + row.id + '/edit')
+                let r=this.$router.resolve({
+                    name: 'PersonEdit',
+                    params: {personId: n + '' + row.id}
+                })
+                window.open(r.href,'_blank')
             },
             deleteperson(row) {
                 const _this = this

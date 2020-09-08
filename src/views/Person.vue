@@ -56,8 +56,8 @@
         data() {
             return {
                 currentPage: 1, // 当前页
-                total: 0,        // 文章总数
-                pageSize: 10,     // 页面大小，每页文章数
+                total: 0,        // 总数
+                pageSize: 20,     // 页面大小
                 persons: [],
                 keysnamec: '',
                 dialogVisible: false,    // 分享弹出框显示和隐藏
@@ -87,7 +87,12 @@
             },
             editperson(row, n) {
                 // n 区分查看还是编辑，决定创建/编辑按钮是否显示。1：查看。2：编辑
-                this.$router.push('/person/' + n + '' + row.id + '/edit')
+                // this.$router.push('/person/' + n + '' + row.id + '/edit')
+                let r=this.$router.resolve({
+                    name: 'PersonEdit',
+                    params: {personId: n + '' + row.id}
+                })
+                window.open(r.href,'_blank')
             },
             deleteperson(row) {
                 const _this = this
@@ -126,7 +131,7 @@
                         '期望薪资：' + (row.salaryexpect == null ? '' : row.salaryexpect) + '\n' +
                         '简历日期：' + row.induction + '\n' +
                         '招聘渠道：' + (row.employfrom == null ? '' : row.employfrom) + '\n' +
-                        '毕业时间：' + (row.gmt_report == null ? '' : row.gmt_report) + '\n' +
+                        '毕业时间：' + (row.gmtReport == null ? '' : row.gmtReport) + '\n' +
                         '是否面试：' + (row.isinterview == 1 ? '已面试' : '未面试') + '\n' +
                         '面试结果：' + (row.interviewres == 1 ? '已通过' : '未通过') + '\n' +
                         '备注/其它：' + (row.workset == null ? '无' : row.workset) + '\n' +
