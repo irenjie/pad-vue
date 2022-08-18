@@ -2,7 +2,7 @@
 
 一个简单的 SpringBoot + Vue + ElementUI 人事管理系统
 
-本项目是前端代码，前后端前往 [pad](https://github.com/irenjie/pad)   
+本项目是前端代码，后端前往 [pad](https://github.com/irenjie/pad)   
 
 ### 上线修改
 
